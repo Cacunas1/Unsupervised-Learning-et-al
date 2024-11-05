@@ -95,6 +95,9 @@ def main():
     # UNIT TEST
     tst.compute_centroids_test(compute_centroids)
 
+    print("=" * 80)
+    print("\tGraded Part 2")
+
 
 if __name__ == "__main__":
     main()

@@ -8,7 +8,7 @@
 #       format_version: '1.5'
 #       jupytext_version: 1.16.4
 #   kernelspec:
-#     display_name: Python 3
+#     display_name: Python 3 (ipykernel)
 #     language: python
 #     name: python3
 # ---
@@ -46,7 +46,6 @@ import matplotlib.pyplot as plt
 
 # + deletable=false editable=false
 import numpy as np
-
 from utils import *
 
 # %matplotlib inline
@@ -187,7 +186,7 @@ plt.show()
 # GRADED FUNCTION: estimate_gaussian
 
 
-def estimate_gaussian(X):
+def estimate_gaussian(X: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     """
     Calculates mean and variance of all features
     in the dataset
@@ -199,11 +198,15 @@ def estimate_gaussian(X):
         mu (ndarray): (n,) Mean of all features
         var (ndarray): (n,) Variance of all features
     """
-
-    m, n = X.shape
-
     ### START CODE HERE ###
+    m: int
+    m = X.shape[0]
 
+    mu: np.ndarray
+    var: np.ndarray
+
+    mu = np.array(sum([x for x in X]) / m)
+    var = np.array(sum([(x - mu) ** 2 for x in X])) / m
     ### END CODE HERE ###
 
     return mu, var
@@ -347,7 +350,7 @@ visualize_fit(X_train, mu, var)
 # GRADED FUNCTION: select_threshold
 
 
-def select_threshold(y_val, p_val):
+def select_threshold(y_val: np.ndarray, p_val: np.ndarray) -> tuple[float, float]:
     """
     Finds the best threshold to use for selecting outliers
     based on the results from a validation set (p_val)
@@ -362,15 +365,31 @@ def select_threshold(y_val, p_val):
         F1 (float):      F1 score by choosing epsilon as threshold
     """
 
-    best_epsilon = 0
-    best_F1 = 0
-    F1 = 0
+    best_epsilon: float = 0.0
+    best_F1 = 0.0
+    F1: float = 0.0
 
-    step_size = (max(p_val) - min(p_val)) / 1000
+    m: int = y_val.shape[0]
+
+    step_size = (max(p_val) - min(p_val)) / 1_000
 
     for epsilon in np.arange(min(p_val), max(p_val), step_size):
         ### START CODE HERE ###
+        y_pred: np.ndarray = np.array([1 if p < epsilon else 0 for p in p_val])
+        tp: int = 0
+        fp: int = 0
+        tn: int = 0
+        fn: int = 0
 
+        for i in range(m):
+            tp += 1 if y_pred[i] == y_val[i] and y_pred[i] == 1 else 0
+            fp += 1 if y_pred[i] != y_val[i] and y_pred[i] == 1 else 0
+            tn += 1 if y_pred[i] == y_val[i] and y_pred[i] == 0 else 0
+            fn += 1 if y_pred[i] != y_val[i] and y_pred[i] == 0 else 0
+
+        prec: float = tp / (tp + fp) if tp + fp > 0 else 0.0
+        rec: float = tp / (tp + fn) if tp + fn > 0 else 0.0
+        F1 = 2 * prec * rec / (prec + rec) if prec + rec > 0.0 else 0.0
         ### END CODE HERE ###
 
         if F1 > best_F1:
