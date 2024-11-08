@@ -2,6 +2,7 @@ import numpy as np
 import tensorflow as tf
 from tensorflow import keras
 
+import public_tests as tst
 import recsys_utils as utl
 
 # GRADED FUNCTION: cofi_cost_func
@@ -33,8 +34,8 @@ def cofi_cost_func(
     # nm, nu = Y.shape
     J: float = 0.0
     ### START CODE HERE ###
-    Y_predicted: np.ndarray = R * (X @ W.T + b)
-    Error: np.ndarray = Y_predicted - Y
+    Y_predicted: np.ndarray = X @ W.T + b
+    Error: np.ndarray = R * (Y_predicted - Y)
     Regularization: float = np.trace(W.T @ W) + np.trace(X.T @ X)
     J_aux = 0.5 * np.trace(Error.T @ Error) + 0.5 * lambda_ * Regularization
     J = J_aux
@@ -102,6 +103,9 @@ def main():
     # Evaluate cost function with regularization
     J = cofi_cost_func(X_r, W_r, b_r, Y_r, R_r, 1.5)
     print(f"Cost (with regularization): {J:0.2f}")
+
+    # Unit Test
+    tst.test_cofi_cost_func(cofi_cost_func)
 
 
     print("=" * 80)
