@@ -1,9 +1,8 @@
 import numpy as np
-import tensorflow as tf
-from tensorflow import keras
-
 import public_tests as tst
 import recsys_utils as utl
+import tensorflow as tf
+from tensorflow import keras
 
 # GRADED FUNCTION: cofi_cost_func
 # UNQ_C1
@@ -106,7 +105,6 @@ def main():
 
     # Unit Test
     tst.test_cofi_cost_func(cofi_cost_func)
-
 
     print("=" * 80)
 

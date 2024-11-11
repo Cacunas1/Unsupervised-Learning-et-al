@@ -16,7 +16,9 @@ def normalizeRatings(Y, R):
     return (Ynorm, Ymean)
 
 
-def load_precalc_params_small() -> tuple[np.ndarray, np.ndarray, np.ndarray, int, int, int]:
+def load_precalc_params_small() -> (
+    tuple[np.ndarray, np.ndarray, np.ndarray, int, int, int]
+):
     file = open("./data/small_movies_X.csv", "rb")
     X = loadtxt(file, delimiter=",")
 
