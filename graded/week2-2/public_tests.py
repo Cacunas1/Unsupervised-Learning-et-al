@@ -1,6 +1,6 @@
 import numpy as np
-from tensorflow.keras.activations import linear, relu
-from tensorflow.keras.layers import Dense
+from keras.activations import linear, relu
+from keras.layers import Dense
 
 
 def test_tower(target):
@@ -10,9 +10,9 @@ def test_tower(target):
         len(target.layers) == 3
     ), f"Wrong number of layers. Expected 3 but got {len(target.layers)}"
     expected = [
-        [Dense, [None, 256], relu],
-        [Dense, [None, 128], relu],
-        [Dense, [None, num_outputs], linear],
+        [Dense, (None, 256), relu],
+        [Dense, (None, 128), relu],
+        [Dense, (None, num_outputs), linear],
     ]
 
     for layer in target.layers:
@@ -20,8 +20,8 @@ def test_tower(target):
             type(layer) == expected[i][0]
         ), f"Wrong type in layer {i}. Expected {expected[i][0]} but got {type(layer)}"
         assert (
-            layer.output.shape.as_list() == expected[i][1]
-        ), f"Wrong number of units in layer {i}. Expected {expected[i][1]} but got {layer.output.shape.as_list()}"
+            layer.output.shape == expected[i][1]
+        ), f"Wrong number of units in layer {i}. Expected {expected[i][1]} but got {layer.output.shape}"
         assert (
             layer.activation == expected[i][2]
         ), f"Wrong activation in layer {i}. Expected {expected[i][2]} but got {layer.activation}"
