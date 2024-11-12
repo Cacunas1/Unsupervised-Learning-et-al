@@ -1,26 +1,27 @@
 """Utilities for RecSysNN assigment"""
 
 import csv
+import pickle
 from collections import defaultdict
 
 import numpy as np
-import pickle5 as pickle
 import tabulate
 from numpy import genfromtxt
 
 
-def load_data():
+def load_data() -> tuple[np.ndarray, np.ndarray, np.ndarray, list, list, np.ndarray, defaultdict, defaultdict]:
     """called to load preprepared data for the lab"""
-    item_train = genfromtxt("./data/content_item_train.csv", delimiter=",")
-    user_train = genfromtxt("./data/content_user_train.csv", delimiter=",")
-    y_train = genfromtxt("./data/content_y_train.csv", delimiter=",")
+    item_train: np.ndarray = genfromtxt("./data/content_item_train.csv", delimiter=",")
+    user_train: np.ndarray = genfromtxt("./data/content_user_train.csv", delimiter=",")
+    y_train: np.ndarray = genfromtxt("./data/content_y_train.csv", delimiter=",")
+
     with open(
         "./data/content_item_train_header.txt", newline=""
     ) as f:  # csv reader handles quoted strings better
-        item_features = list(csv.reader(f))[0]
+        item_features: list[str] = list(csv.reader(f))[0]
     with open("./data/content_user_train_header.txt", newline="") as f:
-        user_features = list(csv.reader(f))[0]
-    item_vecs = genfromtxt("./data/content_item_vecs.csv", delimiter=",")
+        user_features: list[str] = list(csv.reader(f))[0]
+    item_vecs: np.ndarray = genfromtxt("./data/content_item_vecs.csv", delimiter=",")
 
     movie_dict = defaultdict(dict)
     count = 0
@@ -38,7 +39,7 @@ def load_data():
                 movie_dict[movie_id]["genres"] = line[2]
 
     with open("./data/content_user_to_genre.pickle", "rb") as f:
-        user_to_genre = pickle.load(f)
+        user_to_genre: defaultdict = pickle.load(f)
 
     return (
         item_train,
@@ -126,7 +127,7 @@ def split_str(ifeatures, smax):
     """split the feature name strings to tables fit"""
     ofeatures = []
     for s in ifeatures:
-        if not " " in s:  # skip string that already have a space
+        if " " not in s:  # skip string that already have a space
             if len(s) > smax:
                 mid = int(len(s) / 2)
                 s = s[:mid] + " " + s[mid:]
@@ -191,11 +192,11 @@ def get_user_vecs(user_id, user_train, item_vecs, user_to_genre):
     user train/predict matrix to match the size of item_vecs
     y vector with ratings for all rated movies and 0 for others of size item_vecs"""
 
-    if not user_id in user_to_genre:
+    if user_id not in user_to_genre:
         print("error: unknown user id")
         return None
     else:
-        user_vec_found = False
+        user_vec_found: bool = False
         for i in range(len(user_train)):
             if user_train[i, 0] == user_id:
                 user_vec = user_train[i]
