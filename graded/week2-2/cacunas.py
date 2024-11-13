@@ -4,14 +4,13 @@ from typing import Optional
 
 import numpy as np
 import pandas as pd
+import public_tests as tst
+import recsysNN_utils as utl
 import tabulate
 import tensorflow as tf
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler, StandardScaler
 from tensorflow import keras
-
-import public_tests as tst
-import recsysNN_utils as utl
 
 
 @keras.utils.register_keras_serializable("CacunasSolutions")
@@ -234,9 +233,7 @@ def main():
     model: keras.Model
     user_NN: keras.Model
     item_NN: keras.Model
-    model, user_NN, item_NN = get_model(
-        num_item_features, num_user_features, True
-    )
+    model, user_NN, item_NN = get_model(num_item_features, num_user_features, True)
 
     tst.test_tower(user_NN)
     tst.test_tower(item_NN)
@@ -369,41 +366,49 @@ def main():
     b3 = np.array([1, 0, 0])
     print(f"squared distance between a1 and b1: {sq_dist(a1, b1):0.3f}")
     print(f"squared distance between a2 and b2: {sq_dist(a2, b2):0.3f}")
-    print(f"squared distance between a3 and b3: {sq_dist(a3, b3):0.3f}") 
+    print(f"squared distance between a3 and b3: {sq_dist(a3, b3):0.3f}")
 
     # Public tests
-    tst.test_sq_dist(sq_dist)    
-    
-    input_item_m = tf.keras.layers.Input(shape=(num_item_features))    # input layer
-    vm_m = item_NN(input_item_m)                                       # use the trained item_NN
-    vm_m = tf.linalg.l2_normalize(vm_m, axis=1)                        # incorporate normalization as was done in the original model
-    model_m = tf.keras.Model(input_item_m, vm_m)                                
+    tst.test_sq_dist(sq_dist)
+
+    input_item_m = tf.keras.layers.Input(shape=(num_item_features))  # input layer
+    vm_m = item_NN(input_item_m)  # use the trained item_NN
+    vm_m = tf.linalg.l2_normalize(
+        vm_m, axis=1
+    )  # incorporate normalization as was done in the original model
+    model_m = tf.keras.Model(input_item_m, vm_m)
     model_m.summary()
 
-
     scaled_item_vecs = scalerItem.transform(item_vecs)
-    vms = model_m.predict(scaled_item_vecs[:,i_s:])
+    vms = model_m.predict(scaled_item_vecs[:, i_s:])
     print(f"size of all predicted movie feature vectors: {vms.shape}")
 
     count = 50  # number of movies to display
     dim = len(vms)
-    dist = np.zeros((dim,dim))
+    dist = np.zeros((dim, dim))
 
     for i in range(dim):
         for j in range(dim):
-            dist[i,j] = sq_dist(vms[i, :], vms[j, :])
-            
-    m_dist = np.ma.masked_array(dist, mask=np.identity(dist.shape[0]))  # mask the diagonal
+            dist[i, j] = sq_dist(vms[i, :], vms[j, :])
+
+    m_dist = np.ma.masked_array(
+        dist, mask=np.identity(dist.shape[0])
+    )  # mask the diagonal
 
     disp = [["movie1", "genres", "movie2", "genres"]]
     for i in range(count):
         min_idx = np.argmin(m_dist[i])
-        movie1_id = int(item_vecs[i,0])
-        movie2_id = int(item_vecs[min_idx,0])
-        disp.append( [movie_dict[movie1_id]['title'], movie_dict[movie1_id]['genres'],
-                      movie_dict[movie2_id]['title'], movie_dict[movie1_id]['genres']]
-                   )
-    table = tabulate.tabulate(disp, tablefmt='html', headers="firstrow")
+        movie1_id = int(item_vecs[i, 0])
+        movie2_id = int(item_vecs[min_idx, 0])
+        disp.append(
+            [
+                movie_dict[movie1_id]["title"],
+                movie_dict[movie1_id]["genres"],
+                movie_dict[movie2_id]["title"],
+                movie_dict[movie1_id]["genres"],
+            ]
+        )
+    table = tabulate.tabulate(disp, tablefmt="html", headers="firstrow")
     print(table)
 
     print("=" * 80)

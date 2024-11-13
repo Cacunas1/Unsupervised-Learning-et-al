@@ -9,7 +9,18 @@ import tabulate
 from numpy import genfromtxt
 
 
-def load_data() -> tuple[np.ndarray, np.ndarray, np.ndarray, list, list, np.ndarray, defaultdict, defaultdict]:
+def load_data() -> (
+    tuple[
+        np.ndarray,
+        np.ndarray,
+        np.ndarray,
+        list,
+        list,
+        np.ndarray,
+        defaultdict,
+        defaultdict,
+    ]
+):
     """called to load preprepared data for the lab"""
     item_train: np.ndarray = genfromtxt("./data/content_item_train.csv", delimiter=",")
     user_train: np.ndarray = genfromtxt("./data/content_user_train.csv", delimiter=",")
